@@ -1,17 +1,17 @@
 const { response } = require("express");
 const express = require("express");
 const morgan = require("morgan");
+const cors = require("cors");
 
 const app = express();
 
-
-
-morgan.token("person", (req) =>{
+morgan.token("person", (req) => {
     return JSON.stringify(req.body);
 })
 
 app.use(express.json());
 app.use(morgan("tiny"));
+app.use(cors());
 
 
 let persons = [
@@ -50,15 +50,15 @@ app.get("/api/persons", (req, res) => {
 app.get("/api/persons/:id", (req, res) => {
     const id = Number(req.params.id);
     const person = persons.find(person => person.id === id);
-    if(person){
+    if (person) {
         res.json(person);
-    }else{
+    } else {
         res.status(404).end();
     }
-    
+
 });
 
-app.delete("/api/persons/:id", (req,res) => {
+app.delete("/api/persons/:id", (req, res) => {
     const id = Number(req.params.id);
     persons = persons.filter(person => person.id !== id);
 
@@ -70,28 +70,28 @@ const generateId = () => {
     return Math.floor(Math.random() * 99999) + 1;
 };
 
-app.post("/api/persons/", morgan(":person"),  (req, res) =>{
+app.post("/api/persons/", morgan(":person"), (req, res) => {
     const body = req.body;
-    
-    if(!body.name){
+
+    if (!body.name) {
         return res.status(400).json({
             error: "name missing"
         });
     }
 
-    if(!body.number){
+    if (!body.number) {
         return res.status(400).json({
             error: "number missing"
         });
     }
 
-    if(persons.find(person => person.name === body.name)){
+    if (persons.find(person => person.name === body.name)) {
         return res.status(400).json({
             error: "name already in the phonebook"
         });
     }
 
-    const person = {...body, id: generateId() };
+    const person = { ...body, id: generateId() };
 
     persons = persons.concat(person);
 
