@@ -9,6 +9,7 @@ morgan.token("person", (req) => {
     return JSON.stringify(req.body);
 })
 
+app.use(express.static('build'))
 app.use(express.json());
 app.use(morgan("tiny"));
 app.use(cors());
