@@ -17,8 +17,6 @@ app.use(morgan("tiny"));
 app.use(cors());
 
 
-
-
 app.get("/api/persons", (req, res) => {
     Person.find({})
     .then(persons1 => {
@@ -26,7 +24,6 @@ app.get("/api/persons", (req, res) => {
         res.json(persons1);
     })
     
-    //res.json(persons);
 });
 
 app.get("/api/persons/:id", (req, res) => {
@@ -48,9 +45,6 @@ app.delete("/api/persons/:id", (req, res) => {
 
 });
 
-const generateId = () => {
-    return Math.floor(Math.random() * 99999) + 1;
-};
 
 app.post("/api/persons/", morgan(":person"), (req, res) => {
     const body = req.body;
@@ -67,18 +61,22 @@ app.post("/api/persons/", morgan(":person"), (req, res) => {
         });
     }
 
-    if (persons.find(person => person.name === body.name)) {
-        return res.status(400).json({
-            error: "name already in the phonebook"
-        });
-    }
+    // if (persons.find(person => person.name === body.name)) {
+    //     return res.status(400).json({
+    //         error: "name already in the phonebook"
+    //     });
+    // }
 
-    const person = { ...body, id: generateId() };
+    const person = new Person({
+        name: body.name,
+        number: body.number,
+    })
 
-    persons = persons.concat(person);
 
-    res.json(person);
-
+    person.save()
+    .then(savedPerson =>{
+        res.json(savedPerson)
+    })
 
 
 });
