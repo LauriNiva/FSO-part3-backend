@@ -19,21 +19,19 @@ app.use(cors());
 
 app.get("/api/persons", (req, res) => {
     Person.find({})
-    .then(persons1 => {
-        console.log(persons1);
-        res.json(persons1);
-    })
-    
+        .then(persons1 => {
+            console.log(persons1);
+            res.json(persons1);
+        })
+
 });
 
-app.get("/api/persons/:id", (req, res) => {
-    const id = Number(req.params.id);
-    const person = persons.find(person => person.id === id);
-    if (person) {
-        res.json(person);
-    } else {
-        res.status(404).end();
-    }
+app.get("/api/persons/:id", (req, res, next) => {
+    Person.findById(req.params.id)
+        .then(person => {
+            res.json(person);
+        })
+        .catch(err => next(err));
 
 });
 
@@ -46,23 +44,22 @@ app.put("/api/persons/:id", (req, res, next) => {
         number: body.number,
     };
 
-    Person.findByIdAndUpdate(req.params.id, person, {new: true})
-    .then(updatedPerson => {
-        res.json(updatedPerson);
-    })
-    .catch(err => next(err));
+    Person.findByIdAndUpdate(req.params.id, person, { new: true })
+        .then(updatedPerson => {
+            res.json(updatedPerson);
+        })
+        .catch(err => next(err));
 
 });
 
 app.delete("/api/persons/:id", (req, res, next) => {
     Person.findByIdAndRemove(req.params.id)
-    .then(result => {
-        res.status(204).end();
-    })
-    .catch(err => next(err));
+        .then(result => {
+            res.status(204).end();
+        })
+        .catch(err => next(err));
 
 });
-
 
 app.post("/api/persons/", morgan(":person"), (req, res) => {
     const body = req.body;
@@ -79,42 +76,39 @@ app.post("/api/persons/", morgan(":person"), (req, res) => {
         });
     }
 
-    // if (persons.find(person => person.name === body.name)) {
-    //     return res.status(400).json({
-    //         error: "name already in the phonebook"
-    //     });
-    // }
-
     const person = new Person({
         name: body.name,
         number: body.number,
     })
 
-
     person.save()
-    .then(savedPerson =>{
-        res.json(savedPerson)
-    })
+        .then(savedPerson => {
+            res.json(savedPerson)
+        })
 
 
 });
 
 app.get("/info", (req, res) => {
-    res.send(`<p>Phonebook has info for ${persons.length} people</p><p>${new Date}</p>`)
+    Person.find({})
+        .then(persons => {
+            res.send(`<p>Phonebook has info for ${persons.length} people</p><p>${new Date}</p>`);
+        });
+
+
 });
 
 const errorHandler = (error, request, response, next) => {
     console.log(error.message);
 
-    if(error.name === "CastError") {
-        return response.status(400).send({ error: "malformatted id"})
+    if (error.name === "CastError") {
+        return response.status(400).send({ error: "malformatted id" })
     };
 
     next(error);
 };
 
 app.use(errorHandler);
-
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
