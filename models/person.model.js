@@ -7,13 +7,13 @@ const uniqueValidator = require("mongoose-unique-validator");
 const url = process.env.MONGODB_URI;
 
 mongoose
-.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
-.then(res => {
-    console.log("Connected to MongoDB");
-})
-.catch(err => {
-    console.log("Error connecting to MongoDB: ", err.message);
-});
+    .connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
+    .then(res => {
+        console.log("Connected to MongoDB");
+    })
+    .catch(err => {
+        console.log("Error connecting to MongoDB: ", err.message);
+    });
 
 const personSchema = new mongoose.Schema({
     name: {
@@ -37,7 +37,7 @@ personSchema.set("toJSON", {
         delete returnObj._id;
         delete returnObj.__v;
     }
-})
+});
 
 module.exports = mongoose.model("Person", personSchema);
 
